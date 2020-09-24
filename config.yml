@@ -1,0 +1,43 @@
+# HTTP
+#############
+server:
+  # Host is the local machine IP Address to bind the HTTP Server to
+  host: 127.0.0.1
+  # Port is the local machine TCP Port to bind the HTTP Server to
+  port: 8053
+  timeout:
+    # Server is the general server timeout to use for graceful shutdowns
+    server: 30
+    # Read is the amount of time to wait until an HTTP server read operation is cancelled
+    read: 10
+    # Write is the amount of time to wait until an HTTP server write opperation is cancelled
+    write: 10
+    # Read is the amount of time to wait until an IDLE HTTP session is closed
+    idle: 15
+  maxHeaderBytes: 1024
+# tls:
+#  config: *tls.Config
+
+# ARI
+#############
+ari:
+  enable: false 
+
+# AMI
+#############
+ami:
+  enable: false
+  host: "localhost"
+  port: 5038
+  username: "admin"
+  password: "HASp3qw4"
+
+# database
+#############
+db:
+  drvname: "mysql"
+  host: "185.157.77.8"
+  port: 3306
+  username: "gofra"
+  password: "Zie8ahnai7eaf"
+  database: "asteriskcdrdb"
