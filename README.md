@@ -1,5 +1,5 @@
 # GOFRA 
-### (Golang Free Restful Asterisk)
+### (GOlang Free Restful Asterisk)
 
 REST API for Asterisk, FreePBX
 
