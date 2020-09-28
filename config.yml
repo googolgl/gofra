@@ -21,16 +21,21 @@ server:
 # ARI
 #############
 ari:
-  enable: false 
+  enable: false
+  application: "test"
+  username: "admin"
+  password: "HASp3qw4"
+  url: "http://localhost:8088/ari"
+  ws: "ws://localhost:8088/ari/events"
 
 # AMI
 #############
 ami:
   enable: false
-  host: "localhost"
-  port: 5038
   username: "admin"
   password: "HASp3qw4"
+  host: "localhost"
+  port: 5038
 
 # database
 #############
@@ -38,6 +43,10 @@ db:
   drvname: "mysql"
   host: "185.157.77.8"
   port: 3306
+  database: "asteriskcdrdb"
   username: "gofra"
   password: "Zie8ahnai7eaf"
-  database: "asteriskcdrdb"
+  
+# File path
+#############
+filepath: "/var/spool/asterisk/monitor"

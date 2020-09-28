@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 //Middleware - main handler
@@ -18,22 +20,51 @@ func Middleware(next http.Handler) http.Handler {
 	})
 }
 
-func cdrHandler(w http.ResponseWriter, r *http.Request) {
+//ARIHandler asterisk restful interface handler
+func ARIHandler(w http.ResponseWriter, r *http.Request) {
+
+	w.Write([]byte("ok"))
+}
+
+//AMIHandler asterisk manager interface handler
+func AMIHandler(w http.ResponseWriter, r *http.Request) {
+	switch mux.Vars(r)["cmd"] {
+	case "my":
+
+	}
+
+	w.Write([]byte("ok"))
+}
+
+//CDRHandler asterisk call detail records handler
+func CDRHandler(w http.ResponseWriter, r *http.Request) {
+	var respData []byte
 
 	sd := r.FormValue("startDate")
 	ed := r.FormValue("endDate")
 
-	//condition := `WHERE calldate between '` + sd + ` 00:00:00' and '` + ed + ` 23:59:59'`
-	condition := `WHERE calldate between ` + sd + ` and ` + ed
-	res := GetStatByDate(condition)
+	if len(sd) > 0 && len(ed) > 0 {
+		condition := `WHERE calldate between ` + sd + ` and ` + ed
+		res, err := GetStatBy(condition)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
-	dt, err := json.Marshal(res)
-	if err != nil {
-		cfg.Log.Errorf("Marshal: %v", err)
-		http.Error(w, "marshal error", http.StatusInternalServerError)
-		return
+		respData, err = json.Marshal(res)
+		if err != nil {
+			cfg.Log.Errorf("marshal: %v", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(dt)
+	if respData == nil {
+		w.WriteHeader(http.StatusBadRequest)
+	} else {
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
+	}
+
+	w.Write(respData)
 }

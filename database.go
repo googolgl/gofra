@@ -46,11 +46,12 @@ func connectDB() (*sql.DB, error) {
 	return db, nil
 }
 
-//GetStatByDate - main database function
-func GetStatByDate(condition string) []CDR {
+//GetStatBy - main database function
+func GetStatBy(condition string) ([]CDR, error) {
 	db, err := connectDB()
 	if err != nil {
 		cfg.Log.Errorf("connect: %v", err)
+		return nil, err
 	}
 	defer db.Close()
 
@@ -59,6 +60,7 @@ func GetStatByDate(condition string) []CDR {
 		`FROM cdr ` + condition)
 	if err != nil {
 		cfg.Log.Errorf("query: %v", err)
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -78,13 +80,8 @@ func GetStatByDate(condition string) []CDR {
 
 	if err = rows.Err(); err != nil {
 		cfg.Log.Errorf("error handling: %v", err)
+		return nil, err
 	}
-	/*if startdate == "" || enddate == "" {
-		query.Table("cdr").Where("src=? or dst=?", MSISDN, MSISDN).Find(&cdrs)
-	} else {
-		query.Table("cdr").Where("calldate between ? and ? and (src=? or dst=?)",
-			startdate+" 00:00:00", enddate+" 23:59:00", MSISDN, MSISDN).Find(&cdrs)
-	}*/
 
-	return arrayCDR
+	return arrayCDR, nil
 }

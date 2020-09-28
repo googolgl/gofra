@@ -22,7 +22,12 @@ type config struct {
 		} `yaml:"timeout"`
 	} `yaml:"server"`
 	ARI struct {
-		Enable bool `yaml:"enable"`
+		Enable      bool   `yaml:"enable"`
+		Application string `yaml:"application"`
+		URL         string `yaml:"url"`
+		WS          string `yaml:"ws"`
+		UserName    string `yaml:"username"`
+		Password    string `yaml:"password"`
 	} `yaml:"ari"`
 	AMI struct {
 		Enable   bool   `yaml:"enable"`
@@ -35,11 +40,12 @@ type config struct {
 		DrvName  string `yaml:"drvname"`
 		Host     string `yaml:"host"`
 		Port     string `yaml:"port"`
+		Database string `yaml:"database"`
 		UserName string `yaml:"username"`
 		Password string `yaml:"password"`
-		Database string `yaml:"database"`
 	} `yaml:"db"`
-	Log *logrus.Logger
+	FilePath string `yaml:"filepath"`
+	Log      *logrus.Logger
 }
 
 func configNew() *config {

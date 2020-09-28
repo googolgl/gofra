@@ -13,14 +13,31 @@ var (
 
 func main() {
 	// Set DEBUG level
-	cfg.Log.SetLevel(5)
+	//cfg.Log.SetLevel(5)
+
+	// init mux router
+	router := mux.NewRouter().StrictSlash(true)
+
+	// Runing ARI
+	if cfg.ARI.Enable {
+		/*if err := ariRun(); err != nil {
+			cfg.Log.Panicf("Run ARI: %v", err)
+		}*/
+		router.HandleFunc("/api/ari/{cmd}", ARIHandler).Methods("POST")
+	}
+
+	// Runing AMI
+	if cfg.AMI.Enable {
+		if _, err := amiRun(); err != nil {
+			cfg.Log.Panicf("Run AMI: %v", err)
+		}
+		router.HandleFunc("/api/ami/{cmd}", AMIHandler).Methods("POST")
+	}
 
 	// Runing http server
-	router := mux.NewRouter().StrictSlash(true)
 	router.Use(Middleware)
-	//router.HandleFunc("/api/ami", signHandler).Methods("POST")
-	//router.HandleFunc("/api/ari", robotHandler).Methods("POST")
-	router.HandleFunc("/api/cdr", cdrHandler).Methods("GET")
+	router.PathPrefix("/file/").Handler(http.StripPrefix("/file", http.FileServer(http.Dir(cfg.FilePath))))
+	router.HandleFunc("/api/cdr", CDRHandler).Methods("GET")
 	http.Handle("/", router)
 
 	srv := http.Server{
