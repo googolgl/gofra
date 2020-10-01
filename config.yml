@@ -24,7 +24,7 @@ ari:
   enable: false
   application: "test"
   username: "admin"
-  password: "HASp3qw4"
+  password: ""
   url: "http://localhost:8088/ari"
   ws: "ws://localhost:8088/ari/events"
 
@@ -33,8 +33,8 @@ ari:
 ami:
   enable: true
   username: "gofra"
-  password: "eiqui"
-  host: "185.157.77.8"
+  password: ""
+  host: "localhost"
   port: 5038
 
 # database
@@ -45,7 +45,7 @@ db:
   port: 3306
   database: "asteriskcdrdb"
   username: "gofra"
-  password: "Zie8af"
+  password: ""
   
 # Records files path
 #############
