@@ -31,22 +31,27 @@ ari:
 # AMI
 #############
 ami:
-  enable: false
-  username: "admin"
-  password: "HASp3qw4"
-  host: "localhost"
+  enable: true
+  username: "gofra"
+  password: "eiqui"
+  host: "185.157.77.8"
   port: 5038
 
 # database
 #############
 db:
   drvname: "mysql"
-  host: "185.157.77.8"
+  host: "localhost"
   port: 3306
   database: "asteriskcdrdb"
   username: "gofra"
-  password: "Zie8ahnai7eaf"
+  password: "Zie8af"
   
-# File path
+# Records files path
 #############
 filepath: "/var/spool/asterisk/monitor"
+
+# Log level
+#############
+# Available log level: (panic, fatal, error, warning, info, debug)
+loglevel: debug
