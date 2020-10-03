@@ -40,6 +40,13 @@ type Config struct {
 		UserName string `yaml:"username"`
 		Password string `yaml:"password"`
 	} `yaml:"ami"`
+	CDR struct {
+		Enable  bool   `yaml:"enable"`
+		Recname string `yaml:"recname"`
+	} `yaml:"cdr"`
+	CEL struct {
+		Enable bool `yaml:"enable"`
+	} `yaml:"CEL"`
 	DB struct {
 		DrvName  string `yaml:"drvname"`
 		Host     string `yaml:"host"`

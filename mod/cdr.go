@@ -21,7 +21,6 @@ type CDR struct {
 	Lastapp       string    `json:"lastapp"`
 	Duration      int       `json:"duration"`
 	Billsec       int       `json:"billsec"`
-	Amaflags      int       `json:"amaflags"`
 	Sequence      int       `json:"sequence"`
 	UniqueID      string    `json:"uniqueid"`
 	ActionID      string    `json:"actionid"`
@@ -74,9 +73,16 @@ func cdrGetStatBy(condition string) ([]CDR, error) {
 
 	cfg.Log = cfg.Log.WithFields(logrus.Fields{"mod": "cdr", "func": "cdrGetStatBy"})
 
-	rows, err := db.Query(`SELECT calldate, src, dst, dcontext, channel, dstchannel, ` +
-		`lastapp, duration, billsec, disposition, amaflags, uniqueid, recordingfile, sequence ` +
-		`FROM cdr ` + condition)
+	queryString := `SELECT calldate, src, dst, dcontext, channel, dstchannel, ` +
+		`lastapp, duration, billsec, disposition, uniqueid, sequence FROM cdr ` + condition
+
+	if cfg.CDR.Recname != "" {
+		queryString = `SELECT calldate, src, dst, dcontext, channel, dstchannel, ` +
+			`lastapp, duration, billsec, disposition, uniqueid, recordingfile, sequence ` +
+			`FROM cdr ` + condition
+	}
+
+	rows, err := db.Query(queryString)
 	if err != nil {
 		cfg.Log.Errorf("query: %v", err)
 		return nil, err
@@ -87,9 +93,15 @@ func cdrGetStatBy(condition string) ([]CDR, error) {
 	var arrayCDR []CDR
 	// Fetch rows
 	for rows.Next() {
-		err = rows.Scan(&cdr.CallDate, &cdr.Src, &cdr.Dst, &cdr.Dcontext, &cdr.Channel,
-			&cdr.Dstchannel, &cdr.Lastapp, &cdr.Duration, &cdr.Billsec, &cdr.Disposition,
-			&cdr.Amaflags, &cdr.UniqueID, &cdr.RecordingFile, &cdr.Sequence)
+		if cfg.CDR.Recname != "" {
+			err = rows.Scan(&cdr.CallDate, &cdr.Src, &cdr.Dst, &cdr.Dcontext, &cdr.Channel,
+				&cdr.Dstchannel, &cdr.Lastapp, &cdr.Duration, &cdr.Billsec, &cdr.Disposition,
+				&cdr.UniqueID, &cdr.RecordingFile, &cdr.Sequence)
+		} else {
+			err = rows.Scan(&cdr.CallDate, &cdr.Src, &cdr.Dst, &cdr.Dcontext, &cdr.Channel,
+				&cdr.Dstchannel, &cdr.Lastapp, &cdr.Duration, &cdr.Billsec, &cdr.Disposition,
+				&cdr.UniqueID, &cdr.Sequence)
+		}
 		if err != nil {
 			cfg.Log.Errorf("fetch: %v", err)
 			break

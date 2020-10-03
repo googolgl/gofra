@@ -24,7 +24,7 @@ ari:
   enable: false
   application: "test"
   username: "admin"
-  password: ""
+  password: "HASp3qw4"
   url: "http://localhost:8088/ari"
   ws: "ws://localhost:8088/ari/events"
 
@@ -33,9 +33,21 @@ ari:
 ami:
   enable: true
   username: "gofra"
-  password: ""
+  password: "eiquiNoo5eequ"
   host: "localhost"
   port: 5038
+
+# CDR
+#############
+cdr:
+  enable: true
+  # uncomment this field if in database exist record file name
+  #recname: "recordingfile"
+
+# CEL
+#############
+cel:
+  enable: false
 
 # database
 #############
@@ -45,8 +57,8 @@ db:
   port: 3306
   database: "asteriskcdrdb"
   username: "gofra"
-  password: ""
-  
+  password: "Zie8ahnai7eaf"
+
 # Records files path
 #############
 filepath: "/var/spool/asterisk/monitor"

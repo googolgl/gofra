@@ -1,9 +1,11 @@
 package mod
 
 import (
+	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 
 	"github.com/googolgl/gami"
 	"github.com/gorilla/mux"
@@ -70,33 +72,65 @@ func HandlerAMI(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer clientAMI.Close()
 
+	var rsp []byte
 	var respData *gami.AMIResponse
 	switch typeAction {
 	case "sync":
-		respData, err = clientAMI.Action(pami)
+		respAction, _, err := clientAMI.Action(pami)
+		if err != nil {
+			cfg.Log.Errorf("action ami: %v", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer clientAMI.Close()
+
+		respData = (<-respAction)
+
+	case "async":
+		webHook, _ := pami["webhook"]
+
+		respAction, respActionID, err := clientAMI.Action(pami)
 		if err != nil {
 			cfg.Log.Errorf("action ami: %v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-	case "async":
-		//pami["ActionID"] = fmt.Sprintf("%d", time.Now().UnixNano())
-		_, err := clientAMI.AsyncAction(pami)
-		if err != nil {
-			cfg.Log.Errorf("asyncAction ami: %v", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		go func() {
+			defer clientAMI.Close()
+
+			if len(webHook) != 0 {
+				// Send webhook
+				rsp, err = json.Marshal(<-respAction)
+				if err != nil {
+					cfg.Log.Errorf("marshal : %v", err)
+					return
+				}
+
+				url, err := url.Parse(webHook)
+				if err != nil {
+					cfg.Log.Errorf("url parsing: %v", err)
+					return
+				}
+
+				resp, err := http.Post(url.String(), "application/json", bytes.NewBuffer(rsp))
+				if err != nil {
+					cfg.Log.Errorf("post request: %v", err)
+					return
+				}
+				defer resp.Body.Close()
+			}
+
+		}()
+
 		respData = &gami.AMIResponse{
-			ID:     pami["ActionID"],
-			Status: "Success",
+			ID:     respActionID,
+			Status: "Accepted",
 		}
 	}
 
-	rsp, err := json.Marshal(respData)
+	rsp, err = json.Marshal(respData)
 	if err != nil {
 		cfg.Log.Errorf("marshal : %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)

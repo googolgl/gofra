@@ -20,26 +20,30 @@ func main() {
 	// init mux router
 	router := mux.NewRouter().StrictSlash(true)
 
-	// Runing ARI
+	// Activate ARI
 	if cfg.ARI.Enable {
-		/*if err := ariRun(); err != nil {
-			cfg.Log.Panicf("Run ARI: %v", err)
-		}*/
+		cfg.Log.Debug("cfg.ARI.Enable")
 		router.HandleFunc("/api/ari/{cmd}", mod.HandlerARI).Methods("POST")
 	}
 
-	// Runing AMI
+	// Activate AMI
 	if cfg.AMI.Enable {
-		/*if _, err := mod.AMIRun(); err != nil {
-			cfg.Log.Panicf("Run AMI: %v", err)
-		}*/
 		router.HandleFunc("/api/ami/{type}", mod.HandlerAMI).Methods("POST")
+	}
+
+	// Activate CDR
+	if cfg.CDR.Enable {
+		router.HandleFunc("/api/cdr", mod.HandlerCDR).Methods("GET")
+	}
+
+	// Activate CEL
+	if cfg.CEL.Enable {
+		router.HandleFunc("/api/cel", mod.HandlerCDR).Methods("GET")
 	}
 
 	// Runing http server
 	router.Use(Middleware)
 	router.PathPrefix("/file/").Handler(http.StripPrefix("/file", http.FileServer(http.Dir(cfg.FilePath))))
-	router.HandleFunc("/api/cdr", mod.HandlerCDR).Methods("GET")
 	http.Handle("/", router)
 
 	srv := http.Server{
